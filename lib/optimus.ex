@@ -9,6 +9,7 @@ defmodule Optimus do
     :version,
     :author,
     :about,
+    :help_flag,
     :allow_unknown_args,
     :parse_double_dash,
     :args,
@@ -79,6 +80,7 @@ defmodule Optimus do
           | {:version, String.t()}
           | {:author, String.t()}
           | {:about, String.t()}
+          | {:help_flag, boolean}
           | {:allow_unknown_args, boolean}
           | {:parse_double_dash, boolean}
           | {:args, [arg_spec_item]}

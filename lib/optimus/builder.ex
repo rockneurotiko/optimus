@@ -13,6 +13,7 @@ defmodule Optimus.Builder do
          {:ok, version} <- build_version(props),
          {:ok, author} <- build_author(props),
          {:ok, about} <- build_about(props),
+         {:ok, help_flag} <- build_help_flag(props),
          {:ok, allow_unknown_args} <- build_allow_unknown_args(props),
          {:ok, parse_double_dash} <- build_parse_double_dash(props),
          {:ok, args} <- build_args(props[:args]),
@@ -30,6 +31,7 @@ defmodule Optimus.Builder do
               version: version,
               author: author,
               about: about,
+              help_flag: help_flag,
               allow_unknown_args: allow_unknown_args,
               parse_double_dash: parse_double_dash,
               args: args,
@@ -57,6 +59,10 @@ defmodule Optimus.Builder do
 
   defp build_about(props) do
     PP.build_string(:about, props[:about], nil)
+  end
+
+  defp build_help_flag(props) do
+    PP.build_bool(:help_flag, props[:help_flag], false)
   end
 
   defp build_allow_unknown_args(props) do
