@@ -123,6 +123,7 @@ defmodule Optimus do
   def parse(optimus, command_line) do
     with :ok <- validate_command_line(command_line),
          :ok <- parse_specials(optimus, command_line),
+         command_line = filter_command_line(optimus, command_line),
          {sub_optimus, subcommand_path, sub_command_line} <-
            find_subcommand(optimus, [], command_line),
          {parsed, errors, unknown} <-
@@ -191,26 +192,30 @@ defmodule Optimus do
 
   defp parse_specials(_, ["--version"]), do: :version
   defp parse_specials(_, ["--help"]), do: :help
+  defp parse_specials(_, ["-h"]), do: :help
 
   defp parse_specials(optimus, ["help" | subcommand]) do
-    case find_exact_subcommand(optimus, subcommand) do
-      [_ | _] = subcommand_path -> {:help, subcommand_path}
-      _ -> {:error, ["invalid subcommand: #{Enum.join(subcommand, " ")}"]}
+    case find_subcommand(optimus, [], subcommand) do
+      {_, [], _} -> :help
+      {_, subcommand_path, _} -> {:help, subcommand_path}
+    end
+  end
+
+  defp parse_specials(%{help_flag: true} = optimus, command_line) do
+    if Enum.find(command_line, &(&1 == "--help" or &1 == "-h")) do
+      parse_specials(optimus, ["help" | command_line])
+    else
+      :ok
     end
   end
 
   defp parse_specials(_, _), do: :ok
 
-  defp find_exact_subcommand(optimus, subcommand, subcommand_path \\ [])
-  defp find_exact_subcommand(_, [], found_path), do: Enum.reverse(found_path)
-
-  defp find_exact_subcommand(optimus, [name | rest], found_path) do
-    case Enum.find(optimus.subcommands, &(name == &1.name)) do
-      %Optimus{subcommand: subcommand} = sub_optimus ->
-        find_exact_subcommand(sub_optimus, rest, [subcommand | found_path])
-
-      _ ->
-        :error
+  defp filter_command_line(optimus, command_line) do
+    if optimus.help_flag do
+      Enum.reject(command_line, &(&1 == "--help" or &1 == "-h"))
+    else
+      command_line
     end
   end
 
