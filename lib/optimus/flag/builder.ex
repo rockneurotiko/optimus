@@ -18,7 +18,7 @@ defmodule Optimus.Flag.Builder do
          {:ok, global} <- build_global(props),
          {:ok, hide} <- build_hide(props),
          {:ok, flag} <-
-           validate(%Flag{
+           validate(%{
              flag
              | short: short,
                long: long,

@@ -22,7 +22,7 @@ defmodule Optimus.Option.Builder do
          {:ok, global} <- build_global(props),
          {:ok, hide} <- build_hide(props),
          {:ok, option} <-
-           validate(%Option{
+           validate(%{
              option
              | value_name: value_name,
                short: short,
